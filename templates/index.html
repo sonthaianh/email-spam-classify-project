@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Email Spam Detector</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body style="text-align: center;">
+    <h1>Email Spam Detector</h1>
+    <form id="spam-form">
+        <label for="message">Enter your email message:</label><br>
+        <textarea name="message" id="message" rows="10" cols="50"></textarea><br><br>
+        <input type="submit" value="Predict">
+    </form>
+    <h2 id="result"></h2>
+    
+    <script>
+        $(document).ready(function() {
+            $('#spam-form').on('submit', function(event) {
+                event.preventDefault();
+                $.ajax({
+                    url: '/predict',
+                    method: 'POST',
+                    data: {
+                        message: $('#message').val()
+                    },
+                    success: function(data) {
+                        $('#result').text('The email is: ' + data.prediction);
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

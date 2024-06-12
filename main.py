@@ -1,9 +1,14 @@
 ################ import packages
+
+from flask import Flask, request, jsonify, render_template
+
 import pandas as pd
 import numpy as np
 from sklearn.model_selection import train_test_split
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.naive_bayes import MultinomialNB
+
+app = Flask(__name__)
 
 ################ import dataset
 pathname_dataset = "Dataset\spam.csv"
@@ -27,22 +32,40 @@ x_train_count.toarray()
 model = MultinomialNB()
 model.fit(x_train_count, y_train)
 
-################ pre-test ham
-email_ham = ["hello there, today we have a meeting together."]
-email_ham_count = cv.transform(email_ham)
-result_predict_1 = model.predict(email_ham_count)
-print("result ham check: ",result_predict_1)
+# ################ pre-test ham
+# email_ham = ["hello there, today we have a meeting together."]
+# email_ham_count = cv.transform(email_ham)
+# result_predict_1 = model.predict(email_ham_count)
+# print("result ham check: ",result_predict_1)
 
-################ pre-test spam
-email_spam = ["click for reward money 1000$."]
-email_spam_count = cv.transform(email_spam)
-result_predict_2 = model.predict(email_spam_count)
-print("result spam check: ", result_predict_2)
+# ################ pre-test spam
+# email_spam = ["click for reward money 1000$."]
+# email_spam_count = cv.transform(email_spam)
+# result_predict_2 = model.predict(email_spam_count)
+# print("result spam check: ", result_predict_2)
 
-################ test model
-x_test_count = cv.transform(x_test)
-result_score = model.score(x_test_count, y_test)
-print(result_score)
+# ################ test model
+# x_test_count = cv.transform(x_test)
+# result_score = model.score(x_test_count, y_test)
+# print(result_score)
+
+
+@app.route('/')
+def home():
+    return render_template('index.html')
+
+@app.route('/predict', methods=['POST'])
+def predict():
+    if request.method == 'POST':
+        message = request.form['message']
+        data = [message]
+        vect = cv.transform(data).toarray()
+        prediction = model.predict(vect)
+        result = "Spam" if prediction == 1 else "Not Spam"
+        return jsonify({'prediction': result})
+
+if __name__ == '__main__':
+    app.run(debug=True)
 
 
 
